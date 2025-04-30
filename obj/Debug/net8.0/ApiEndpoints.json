@@ -1,0 +1,55 @@
+[
+  {
+    "ContainingType": "Email_data.Controllers.EmailInteractionController",
+    "Method": "RecieveEmail",
+    "RelativePath": "api/v1/EmailInteraction/createInboundInteractions",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "emails",
+        "Type": "Email_data.Dtos.GraphApiMsgResourceType[]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Email_data.Controllers.EmailInteractionController",
+    "Method": "GetConversation",
+    "RelativePath": "api/v1/EmailInteraction/getConversation/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Email_data.Controllers.EmailInteractionController",
+    "Method": "GetInteractions",
+    "RelativePath": "api/v1/EmailInteraction/getInteractions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "pageNo",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "recPerPage",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
