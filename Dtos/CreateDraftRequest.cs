@@ -10,6 +10,5 @@ namespace Email_data.Dtos
         public int? ReplyToInteractionId { get; set; }
         public List<Recipient>? BCCRecipients { get; set; } = new List<Recipient>();
         public required Recipient Sender { get; set; }
-        public int? Id { get; set; }
     }
 }
