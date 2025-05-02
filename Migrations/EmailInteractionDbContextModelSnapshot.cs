@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Email_data.Migrations
+namespace EmailApiService.Migrations
 {
     [DbContext(typeof(EmailInteractionDbContext))]
     partial class EmailInteractionDbContextModelSnapshot : ModelSnapshot
@@ -78,6 +78,9 @@ namespace Email_data.Migrations
 
                     b.Property<int>("EmailInteractionDetailsId")
                         .HasColumnType("int");
+
+                    b.Property<string>("LatestConvoResBodyPreview")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Queues")
                         .HasColumnType("nvarchar(max)");

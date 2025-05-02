@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmailApiService.Migrations
 {
     [DbContext(typeof(EmailInteractionDbContext))]
-    [Migration("20250429063048_AddedDraftToEmailInteraction")]
-    partial class AddedDraftToEmailInteraction
+    [Migration("20250430110426_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,6 +81,9 @@ namespace EmailApiService.Migrations
 
                     b.Property<int>("EmailInteractionDetailsId")
                         .HasColumnType("int");
+
+                    b.Property<string>("LatestConvoResBodyPreview")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Queues")
                         .HasColumnType("nvarchar(max)");

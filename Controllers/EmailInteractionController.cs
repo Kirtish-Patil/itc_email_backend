@@ -26,10 +26,12 @@ namespace Email_data.Controllers
         }
 
         [HttpPost("createInboundInteractions")]
-        public async Task<ActionResult> RecieveEmail([FromBody] GraphApiMsgResourceType[] emails)
+        public async Task<ActionResult> CreateInboundInteractions([FromBody] GraphApiMsgResourceType[] emails)
         {
             //var interactions = _service.CreateInboundInteractionArr(emails);
-            emails = emails.OrderBy(i => i.ReceivedDateTime).ToArray();
+            emails = emails.Where(e => e.Sender.EmailAddress.Address != "test.acc.2@outlook.com")
+                .OrderBy(i => i.ReceivedDateTime).ToArray();
+
 
             try
             {
@@ -39,8 +41,8 @@ namespace Email_data.Controllers
                 {
                     var interaction = _service.CreateInboundInteraction(item);
                     _context.EmailInteractions.Add(interaction);
-                    _context.SaveChanges();
                 }
+                _context.SaveChanges();
                 logger.Info("done inserting emails to db");
 
                 return Ok(new { message = "Saved!" });
@@ -62,6 +64,12 @@ namespace Email_data.Controllers
         public async Task<IActionResult> GetConversation([FromRoute] string id)
         {
             return await _service.GetConversation(this, id);
+        }
+
+        [HttpPost("createDraftInteraction")]
+        public async Task<IActionResult> CreateDraftInteraction([FromBody] CreateDraftRequest req)
+        {
+            return await _service.CreateDraftInteraction(this, req);
         }
     }
 }

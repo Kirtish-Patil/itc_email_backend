@@ -1,7 +1,23 @@
 [
   {
     "ContainingType": "Email_data.Controllers.EmailInteractionController",
-    "Method": "RecieveEmail",
+    "Method": "CreateDraftInteraction",
+    "RelativePath": "api/v1/EmailInteraction/createDraftInteraction",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "Email_data.Dtos.CreateDraftRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Email_data.Controllers.EmailInteractionController",
+    "Method": "CreateInboundInteractions",
     "RelativePath": "api/v1/EmailInteraction/createInboundInteractions",
     "HttpMethod": "POST",
     "IsController": true,

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Abstractions;
 using NLog;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Email_data.Services
@@ -169,6 +170,8 @@ namespace Email_data.Services
                     return controller.StatusCode(500, response);
                 }
 
+              
+
                 response.Status = 200;
                 response.Message = "Interaction found successfully";
                 response.Data = interactions;
@@ -193,6 +196,7 @@ namespace Email_data.Services
                     .Include(i => i.EmailInteractionDetails)
                     .Include(i => i.DraftInteraction)
                     .Include(i => i.EmailInteractionDetails.Flag)
+                    .Include(i => i.DraftInteraction.EmailInteractionDetails)
                     .OrderBy(i => i.EmailInteractionDetails.ReceivedDateTime)
                     .Where(i => i.EmailInteractionDetails.ConversationId == conversationId 
                     && !i.EmailInteractionDetails.IsDraft)
@@ -216,20 +220,44 @@ namespace Email_data.Services
         public async Task<IActionResult> CreateDraftInteraction(EmailInteractionController controller, CreateDraftRequest req)
         {
             var response = new GenericApiResponse<EmailInteraction>();
-            var replyTo = req.ReplyTo ?? new List<Recipient>();
+            EmailInteraction? message = null;
+            EmailInteraction? existingReply = null;
+            if (req.Id != null)
+            {
+                message = await _context.EmailInteractions.Include(i => i.DraftInteraction).Where(i => i.Id == req.Id).FirstOrDefaultAsync();
+            }
+            if (message != null && message.DraftInteraction != null)
+            {
+                response.Status = 200;
+                response.Message = "Existing Reply Found Successfully";
+                response.Data = message.DraftInteraction;
+                return controller.Ok(response);
+            }
+
+            var bccRecipients = req.BCCRecipients ?? new List<Recipient>();
             var ccRecipient = req.CCRecipients ?? new List<Recipient>();
             var toRecipients = req.ToRecipients ?? new List<Recipient>();
-            string? convoId = req.ConversationID ?? null;
+            string? convoId = req.ConversationID;
+            var sender = new Recipient() { 
+                EmailAddress = req.Sender.EmailAddress,
+            };
+
+            var from = new Recipient()
+            {
+                EmailAddress = req.Sender.EmailAddress,
+            };
             try
             {
-                var interaction = new EmailInteraction()
+                var draftInteraction = new EmailInteraction()
                 {
                     Direction = InteractionDirection.OUTBOUND,
                     Status = InteractionStatus.OPEN,
+                    ConversationId = req.ConversationID,
+                    ReplyToInteractionId = null,
                     EmailInteractionDetails = new EmailInteractionDetails()
                     {
                         Attachments = [],
-                        BccRecipients = new List<Recipient>(),
+                        BccRecipients = bccRecipients,
                         Body = new EmailBody
                         {
                             Content = string.Empty,
@@ -249,7 +277,7 @@ namespace Email_data.Services
                             DueDateTime = null
                         },
                         ConversationIndex = "",
-                        From = new Recipient(),
+                        From = from,
                         HasAttachments = false,
                         Importance = MsgImportance.NORMAL,
                         InferenceClassification = "",
@@ -260,8 +288,8 @@ namespace Email_data.Services
                         IsReadReceiptRequested = false,
                         LastModifiedDateTime = DateTime.Now,
                         ParentFolderId = null,
-                        ReplyTo = replyTo,
-                        Sender = new Recipient(),
+                        ReplyTo = bccRecipients,
+                        Sender = sender,
                         SentDateTime = null,
                         Subject = "",
                         WebLink = "",
@@ -270,7 +298,7 @@ namespace Email_data.Services
                     }
                 };
 
-                var msg = await _context.EmailInteractions.AddAsync(interaction);
+                var msg = await _context.EmailInteractions.AddAsync(draftInteraction);
 
                 logger.Debug("EmailInteractionDetail added successfully", msg);
 
@@ -278,19 +306,32 @@ namespace Email_data.Services
 
                 logger.Debug("EmailInteractionDetail saved successfully to Db", msg);
 
+                if (req.ConversationID != null)
+                {
+                    var parentInteraction = await _context.EmailInteractions.Where(i => req.ReplyToInteractionId == i.Id).FirstOrDefaultAsync();
+
+                    if (parentInteraction != null)
+                    {
+                        parentInteraction.DraftInteraction = draftInteraction;
+                        await _context.SaveChangesAsync();
+                    }else
+                    {
+                        //await _context.EmailInteractions.Remove(msg);
+                        response.Status = 500;
+                        response.Message = "Draft was created but couldn't update parent interaction";
+                        response.Data = null;
+                        return controller.StatusCode(500, response);
+                    }
+                }
+
                 response.Status = 201;
                 response.Message = "reply Interaction created Successfully";
-                response.Data = interaction;
+                response.Data = draftInteraction;
                 return controller.Ok(response);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                logger.Error("Failed to Create Draft Interaction", ex);
-
-                response.Status = 500;
-                response.Message = "Failed to Create Draft Interaction";
-                response.Data = null;
-                return controller.StatusCode(500, response);
+                throw;
             }
         }
     }

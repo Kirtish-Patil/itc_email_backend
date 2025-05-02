@@ -98,6 +98,37 @@
           }
         }
       }
+    },
+    "/api/v1/EmailInteraction/createDraftInteraction": {
+      "post": {
+        "tags": [
+          "EmailInteraction"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDraftRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDraftRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDraftRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -112,6 +143,48 @@
           "content": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDraftRequest": {
+        "required": [
+          "sender"
+        ],
+        "type": "object",
+        "properties": {
+          "toRecipients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recipient"
+            },
+            "nullable": true
+          },
+          "ccRecipients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recipient"
+            },
+            "nullable": true
+          },
+          "conversationID": {
+            "type": "string",
+            "nullable": true
+          },
+          "replyToInteractionId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "bccRecipients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recipient"
+            },
+            "nullable": true
+          },
+          "sender": {
+            "$ref": "#/components/schemas/Recipient"
           }
         },
         "additionalProperties": false
