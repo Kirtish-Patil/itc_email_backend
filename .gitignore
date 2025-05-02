@@ -10,6 +10,10 @@ build/
 
 .bit.git/
 
+bin/
+obj/
+Migrations/
+
 .vs
 # Compiled Java class files
 *.class
