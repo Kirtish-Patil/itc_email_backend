@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Email_data.props" />
-</Project>
