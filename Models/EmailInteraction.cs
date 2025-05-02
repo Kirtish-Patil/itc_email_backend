@@ -21,7 +21,7 @@ namespace Email_data.Models
         public string? ConversationId { get; set; }
 
         public string? ReplyToInteractionId { get; set; }
-
+        public string? LatestConvoResBodyPreview { get; set; }
         public bool? Top { get; set; }
 
         [ForeignKey("EmailInteractionDetailsId")]
